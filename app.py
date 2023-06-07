@@ -1,15 +1,19 @@
-from flask import Flask, request, jsonify
+# app.py
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@localhost/mydatabase'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres+psycopg2://yabqzbvt:yefwOe3qoKVaVup0eNmlNCPecRbTP8l-@lucky.db.elephantsql.com/yabqzbvt'
+
 db = SQLAlchemy(app)
 
-class Book(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100))
-    author = db.Column(db.String(100))
+# Import and register the book_routes Blueprint
+from routes.book_routes import book_routes
+app.register_blueprint(book_routes)
 
-    def __init__(self, title, author):
-        self.title = title
-        self.author = author
+@app.route("/")
+def home():
+    return render_template("home.html")
+
+if __name__ == '__main__':
+    app.run(debug=True, port=8000)

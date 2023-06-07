@@ -1,10 +1,18 @@
-@app.route('/books', methods=['GET'])
+from flask import jsonify, request
+from models.book import Book
+from app import db
+
 def get_books():
     books = Book.query.all()
-    return jsonify([book.serialize() for book in books])
+    results = [book.serialize() for book in books]
+    return jsonify(results)
 
+def get_book(book_id):
+    book = Book.query.get(book_id)
+    if book is None:
+        return jsonify({'message': 'Book not found'})
+    return jsonify(book.serialize())
 
-@app.route('/books', methods=['POST'])
 def add_book():
     data = request.get_json()
     title = data['title']
@@ -14,16 +22,6 @@ def add_book():
     db.session.commit()
     return jsonify({'message': 'Book added successfully'})
 
-
-@app.route('/books/<book_id>', methods=['GET'])
-def get_book(book_id):
-    book = Book.query.get(book_id)
-    if book is None:
-        return jsonify({'message': 'Book not found'})
-    return jsonify(book.serialize())
-
-
-@app.route('/books/<book_id>', methods=['PUT'])
 def update_book(book_id):
     book = Book.query.get(book_id)
     if book is None:
@@ -34,8 +32,6 @@ def update_book(book_id):
     db.session.commit()
     return jsonify({'message': 'Book updated successfully'})
 
-
-@app.route('/books/<book_id>', methods=['DELETE'])
 def delete_book(book_id):
     book = Book.query.get(book_id)
     if book is None:
